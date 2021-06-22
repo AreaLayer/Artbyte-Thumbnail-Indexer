@@ -50,7 +50,7 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
     console.log('---------ERROR-------')
     console.log(key)
     console.log(error)
-    console.log(typeof body)
+    console.log(body)
   }
   // let params = {
   //   Bucket: artionBucket,
