@@ -74,7 +74,7 @@ const resizeBase64Image = async (source, limit = 120) => {
     if (source.startsWith('data:')) {
       source = source.split(',')[1]
     }
-    let image = sharp(Buffer.from(source, 'base64'), { failOnError: false, limitInputPixels: 0 })
+    let image = sharp(Buffer.from(source, 'base64'), { failOnError: false })
     const { format, width, height } = await image.metadata()
     const size = Math.max(width, height)
     let base64
@@ -88,7 +88,7 @@ const resizeBase64Image = async (source, limit = 120) => {
     } else {
       base64 = source
     }
-    return Buffer.from(base64.replace(/^data:\/\w+;base64,/, ''), 'base64')
+    return Buffer.from(base64.split('base64,')[1], 'base64')
   } catch (err) {
     console.log('--------SHARP ERROR------')
     console.log(err)
