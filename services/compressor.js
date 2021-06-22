@@ -71,7 +71,7 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
 
 const resizeBase64Image = async (source, limit = 120) => {
   try {
-    if (source.startsWith('data:image')) {
+    if (source.startsWith('data:')) {
       source = source.split(',')[1]
     }
     let image = sharp(Buffer.from(source, 'base64'))
@@ -99,19 +99,19 @@ const resizeImageFromURL = (url) => {
       console.log(url)
       request.get(url, async function (error, response, body) {
         if (!error && response.statusCode == 200) {
+
           const base64 =
             'data:' +
             response.headers['content-type'] +
             ';base64,' +
             Buffer.from(body).toString('base64')
-          console.log(base64);
           const res = await resizeBase64Image(base64)
+          console.log('-------------');
+          console.log(res);
           resolve(res)
         }
       })
     } catch (err) {
-      console.log('--encoding error-------------------')
-      console.log(err)
       reject(err)
     }
   })
