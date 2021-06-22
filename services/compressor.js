@@ -38,12 +38,12 @@ const createBucket = async (bucketName) => {
 
 // upload a file to S3 bucket and returns the public URL
 
-const uploadImage2DOS3 = async (body, extension, nftItem) => {
+const uploadImageToInstance = async (body, extension, nftItem) => {
   let fileName = generateFileName()
   let key = `${fileName}.${extension}`
   try {
     const res = await fs.writeFileSync(`thumb-image/${key}`, body);
-    nftItem.thumbnailPath = `https://storage.artion.io/${key}`
+    nftItem.thumbnailPath = `https://storage.artion.io/image/${key}`
     await nftItem.save()
   } catch (error) {
     //
@@ -205,7 +205,7 @@ const compressNFTImage = async () => {
           // case image
           case 3:
             {
-              await uploadImage2DOS3(
+              await uploadImageToInstance(
                 thumbnailInfo[1],
                 thumbnailInfo[2],
                 nftItem,
@@ -231,10 +231,10 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    compressNFTImage();
+    // compressNFTImage();
   } else {
     setTimeout(() => {
-      compressNFTImage();
+      // compressNFTImage();
     }, 1000);
   }
 }
