@@ -43,7 +43,7 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
   let key = `${fileName}.${extension}`
   try {
     const res = await fs.writeFileSync(`thumb-image/${key}`, body);
-    nftItem.thumbnailPath = `https://storage.artion.io/image/${key}`
+    nftItem.thumbnailPath = key;
     await nftItem.save()
   } catch (error) {
     //
