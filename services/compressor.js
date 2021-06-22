@@ -190,6 +190,8 @@ const compressNFTImage = async () => {
         let metadata = await axios.get(tokenURI)
         let image = metadata.data.image
         let thumbnailInfo = await getThumbnailImageFromURL(image)
+        console.log(metadata)
+        console.log(thumbnailInfo)
         switch (thumbnailInfo[0]) {
           //case gif
           case 1:
