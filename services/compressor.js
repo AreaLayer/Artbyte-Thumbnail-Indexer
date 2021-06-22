@@ -239,18 +239,16 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    // compressNFTImage();
+    compressNFTImage();
   } else {
     setTimeout(() => {
-      // compressNFTImage();
+      compressNFTImage();
     }, 1000);
   }
 }
 
 const compress = async () => {
-  // setInterval(async () => {
-    compressNFTImage()
-  // }, 1000)
+  compressNFTImage()
 }
 
 // const compress = async () => {
