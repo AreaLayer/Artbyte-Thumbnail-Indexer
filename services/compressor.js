@@ -96,6 +96,7 @@ const resizeBase64Image = async (source, limit = 120) => {
 const resizeImageFromURL = (url) => {
   return new Promise((resolve, reject) => {
     try {
+      console.log(url)
       request.get(url, async function (error, response, body) {
         if (!error && response.statusCode == 200) {
           const base64 =
@@ -103,11 +104,14 @@ const resizeImageFromURL = (url) => {
             response.headers['content-type'] +
             ';base64,' +
             Buffer.from(body).toString('base64')
+          console.log(base64);
           const res = await resizeBase64Image(base64)
           resolve(res)
         }
       })
     } catch (err) {
+      console.log('--encoding error-------------------')
+      console.log(err)
       reject(err)
     }
   })
@@ -158,6 +162,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
     else if (type == 'non-image') return [2, null]
     else {
       try {
+        console.log(1)
         const buffer = await resizeImageFromURL(imgPath)
         return [3, buffer, type]
       } catch (err) {
@@ -166,6 +171,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
     }
   } catch (error) {
     try {
+      console.log(2)
       const buffer = await resizeImageFromURL(imgPath)
       let fileType = await FileType.fromBuffer(buffer)
       if (fileType.ext) {
@@ -190,7 +196,6 @@ const compressNFTImage = async () => {
         let metadata = await axios.get(tokenURI)
         let image = metadata.data.image
         let thumbnailInfo = await getThumbnailImageFromURL(image)
-        console.log(metadata)
         console.log(thumbnailInfo)
         switch (thumbnailInfo[0]) {
           //case gif
