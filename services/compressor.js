@@ -75,7 +75,10 @@ const resizeBase64Image = async (source, limit = 120) => {
       source = source.split(',')[1]
     }
     let image = sharp(Buffer.from(source, 'base64'))
+    console.log(1)
     const { format, width, height } = await image.metadata()
+    console.log(2)
+    console.log(format)
     const size = Math.max(width, height)
     let base64
     if (size > limit) {
