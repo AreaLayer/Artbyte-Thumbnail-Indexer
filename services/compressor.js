@@ -74,11 +74,8 @@ const resizeBase64Image = async (source, limit = 120) => {
     if (source.startsWith('data:')) {
       source = source.split(',')[1]
     }
-    let image = sharp(Buffer.from(source, 'base64'))
-    console.log(1)
+    let image = sharp(Buffer.from(source, 'base64'), { failOnError: false, limitInputPixels: 0 })
     const { format, width, height } = await image.metadata()
-    console.log(2)
-    console.log(format)
     const size = Math.max(width, height)
     let base64
     if (size > limit) {
@@ -91,8 +88,10 @@ const resizeBase64Image = async (source, limit = 120) => {
     } else {
       base64 = source
     }
-    return Buffer.from(base64.replace(/^data:image\/\w+;base64,/, ''), 'base64')
+    return Buffer.from(base64.replace(/^data:\/\w+;base64,/, ''), 'base64')
   } catch (err) {
+    console.log('--------SHARP ERROR------')
+    console.log(err)
     return null
   }
 }
@@ -109,7 +108,6 @@ const resizeImageFromURL = (url) => {
             Buffer.from(body).toString('base64')
           console.log('------------------------------------------------------------');
           console.log(url);
-          console.log(base64);
           const res = await resizeBase64Image(base64)
           resolve(res)
         }
@@ -241,10 +239,10 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    compressNFTImage();
+    // compressNFTImage();
   } else {
     setTimeout(() => {
-      compressNFTImage();
+      // compressNFTImage();
     }, 1000);
   }
 }
