@@ -78,6 +78,7 @@ const resizeBase64Image = async (source, limit = 120) => {
     const { format, width, height } = await image.metadata()
     const size = Math.max(width, height)
     let base64
+    console.log('----------111----------')
     if (size > limit) {
       image = image.resize(
         Math.floor((width * limit) / size),
@@ -88,6 +89,7 @@ const resizeBase64Image = async (source, limit = 120) => {
     } else {
       base64 = source
     }
+    console.log(base64)
     return Buffer.from(base64.split('base64,')[1], 'base64')
   } catch (err) {
     console.log('--------SHARP ERROR------')
