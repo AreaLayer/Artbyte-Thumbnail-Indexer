@@ -1,0 +1,34 @@
+{
+  "name": "artion_image_compressor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "Jason",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.931.0",
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.22.0",
+    "file-type": "^16.5.0",
+    "flag": "^4.4.0",
+    "googleapis": "^77.0.0",
+    "googlephotos": "^0.3.4",
+    "gulp-imagemin": "^7.1.0",
+    "https": "^1.0.0",
+    "image-type": "^4.1.0",
+    "mongodb": "^3.6.5",
+    "mongoose": "^5.12.2",
+    "node-fetch": "^2.6.1",
+    "path": "^0.12.7",
+    "prettier": "^2.2.1",
+    "request": "^2.88.2",
+    "sharp": "^0.28.3",
+    "url": "^0.11.0"
+  }
+}
