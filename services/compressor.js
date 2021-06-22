@@ -26,15 +26,15 @@ const generateFileName = () => {
 /* Digital Ocean, AWS S3 compatible Bucket related Functions */
 
 // create a S3 bucket
-const createBucket = async (bucketName) => {
-  let params = {
-    Bucket: bucketName,
-  }
-  s3.createBucket(params, function (err, data) {
-    if (err) console.log(err, err.stack)
-    else console.log(data)
-  })
-}
+// const createBucket = async (bucketName) => {
+//   let params = {
+//     Bucket: bucketName,
+//   }
+//   s3.createBucket(params, function (err, data) {
+//     if (err) console.log(err, err.stack)
+//     else console.log(data)
+//   })
+// }
 
 // upload a file to S3 bucket and returns the public URL
 
@@ -47,7 +47,10 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
     await nftItem.save()
   } catch (error) {
     //
+    console.log('---------ERROR-------')
+    console.log(key)
     console.log(error)
+    console.log(typeof body)
   }
   // let params = {
   //   Bucket: artionBucket,
