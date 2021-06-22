@@ -104,6 +104,9 @@ const resizeImageFromURL = (url) => {
             response.headers['content-type'] +
             ';base64,' +
             Buffer.from(body).toString('base64')
+          console.log('------------------------------------------------------------');
+          console.log(url);
+          console.log(base64);
           const res = await resizeBase64Image(base64)
           resolve(res)
         }
