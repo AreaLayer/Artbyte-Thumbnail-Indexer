@@ -99,7 +99,7 @@ const resizeBase64Image = async (source, limit = 120) => {
 const resizeImageFromURL = (url) => {
   return new Promise((resolve, reject) => {
     try {
-      request.get(url, async function (error, response, body) {
+      request.get(url, { timeout: 30000 }, async function (error, response, body) {
         if (!error && response.statusCode == 200) {
 
           const base64 =
@@ -193,14 +193,14 @@ const compressNFTImage = async () => {
     let tokenURI = nftItem.tokenURI
     if (tokenURI) {
       try {
-        let metadata = await axios.get(tokenURI)
+        let metadata = await axios.get(tokenURI, { timeout: 30000 })
         let image = metadata.data.image
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
           case 1:
             {
-              nftItem.thumbnailPath = image
+              nftItem.thumbnailPath = '.'
               await nftItem.save()
             }
             break
