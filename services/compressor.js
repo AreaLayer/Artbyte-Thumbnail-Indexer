@@ -18,10 +18,12 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
   let fileName = generateFileName()
   let key = `${fileName}.${extension}`
   try {
-    const res = await fs.writeFileSync(`thumb-image/${key}`, body)
+    await fs.writeFileSync(`thumb-image/${key}`, body)
     nftItem.thumbnailPath = key
     await nftItem.save()
-  } catch (error) {}
+  } catch (error) {
+    console.log('upload failed')
+  }
 }
 
 const resizeBase64Image = async (source, limit = 120) => {
@@ -49,6 +51,7 @@ const resizeBase64Image = async (source, limit = 120) => {
       'base64',
     )
   } catch (err) {
+    console.log('resize failed')
     return null
   }
 }
@@ -71,6 +74,7 @@ const resizeImageFromURL = (url) => {
         }
       })
     } catch (err) {
+      console.log('resize from url failed')
       reject(err)
     }
   })
@@ -84,6 +88,7 @@ const extractExtension = async (imgURL) => {
       })
     }
   } catch (error) {
+    console.log('cannot xtract xtension')
     return new Promise(async (resolve, reject) => {
       resolve('non-image')
     })
@@ -109,6 +114,7 @@ const extractExtension = async (imgURL) => {
         })
       })
     } catch (error) {
+      console.log('promise error')
       resolve('non-image')
     }
   })
@@ -128,6 +134,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
       }
     }
   } catch (error) {
+    console.log('cannot get thumbnail from url')
     try {
       const buffer = await resizeImageFromURL(imgPath)
       let fileType = await FileType.fromBuffer(buffer)
@@ -137,6 +144,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
         return [3, buffer, 'jpg']
       }
     } catch (err) {
+      console.log('no file type')
       return [4, null]
     }
   }
@@ -148,6 +156,7 @@ const compressNFTImage = async () => {
   })
   if (nftItem) {
     let image = nftItem.imageURL
+    console.log(image)
     if (image) {
       try {
         let thumbnailInfo = await getThumbnailImageFromURL(image)
