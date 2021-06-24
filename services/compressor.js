@@ -205,7 +205,6 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    compressNFTImage()
   } else {
     setTimeout(() => {
       compressNFTImage()
