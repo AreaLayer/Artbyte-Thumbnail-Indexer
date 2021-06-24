@@ -1,5 +1,4 @@
 require('dotenv').config()
-const AWS = require('aws-sdk')
 const axios = require('axios')
 const https = require('https')
 const imageType = require('image-type')
@@ -10,63 +9,19 @@ const fs = require('fs')
 const mongoose = require('mongoose')
 const NFTITEM = mongoose.model('NFTITEM')
 
-const spacesEndpoint = new AWS.Endpoint('sfo3.digitaloceanspaces.com')
-const artionBucket = 'artionstorage'
-// configure S3
-const s3 = new AWS.S3({
-  endpoint: spacesEndpoint,
-  accessKeyId: process.env.SPACES_KEY,
-  secretAccessKey: process.env.SPACES_SECRET,
-})
-
 const generateFileName = () => {
   let fileName = new Date().getTime().toString()
   return fileName
 }
-/* Digital Ocean, AWS S3 compatible Bucket related Functions */
-
-// create a S3 bucket
-// const createBucket = async (bucketName) => {
-//   let params = {
-//     Bucket: bucketName,
-//   }
-//   s3.createBucket(params, function (err, data) {
-//     if (err) console.log(err, err.stack)
-//     else console.log(data)
-//   })
-// }
-
-// upload a file to S3 bucket and returns the public URL
 
 const uploadImageToInstance = async (body, extension, nftItem) => {
   let fileName = generateFileName()
   let key = `${fileName}.${extension}`
   try {
-    const res = await fs.writeFileSync(`thumb-image/${key}`, body);
-    nftItem.thumbnailPath = key;
+    const res = await fs.writeFileSync(`thumb-image/${key}`, body)
+    nftItem.thumbnailPath = key
     await nftItem.save()
-  } catch (error) {
-    //
-    console.log('---------ERROR-------')
-    console.log(key)
-    console.log(error)
-    console.log(body)
-  }
-  // let params = {
-  //   Bucket: artionBucket,
-  //   Key: key,
-  //   Body: body,
-  //   ACL: 'public-read',
-  //   Metadata: {
-  //     'Content-Type': `image/${extension}`,
-  //   },
-  // }
-  // s3.putObject(params, async (err, data) => {
-  //   if (err) {
-  //     console.log(err, err.stack)
-  //   } else {
-  //   }
-  // })
+  } catch (error) {}
 }
 
 const resizeBase64Image = async (source, limit = 120) => {
@@ -88,27 +43,29 @@ const resizeBase64Image = async (source, limit = 120) => {
     } else {
       base64 = source
     }
-    
-    return Buffer.from(base64.indexOf('base64,') >= 0 ? base64.split('base64,')[1] : base64, 'base64')
+
+    return Buffer.from(
+      base64.indexOf('base64,') >= 0 ? base64.split('base64,')[1] : base64,
+      'base64',
+    )
   } catch (err) {
-    console.log('--------SHARP ERROR------')
-    console.log(err)
     return null
   }
 }
 const resizeImageFromURL = (url) => {
   return new Promise((resolve, reject) => {
     try {
-      request.get(url, { timeout: 30000 }, async function (error, response, body) {
+      request.get(url, { timeout: 30000 }, async function (
+        error,
+        response,
+        body,
+      ) {
         if (!error && response.statusCode == 200) {
-
           const base64 =
             'data:' +
             response.headers['content-type'] +
             ';base64,' +
             Buffer.from(body).toString('base64')
-          console.log('------------------------------------------------------------');
-          console.log(url);
           const res = await resizeBase64Image(base64)
           resolve(res)
         }
@@ -190,11 +147,9 @@ const compressNFTImage = async () => {
     thumbnailPath: '-',
   })
   if (nftItem) {
-    let tokenURI = nftItem.tokenURI
-    if (tokenURI) {
+    let image = nftItem.imageURL
+    if (image) {
       try {
-        let metadata = await axios.get(tokenURI, { timeout: 30000 })
-        let image = metadata.data.image
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
@@ -240,11 +195,11 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    compressNFTImage();
+    compressNFTImage()
   } else {
     setTimeout(() => {
-      compressNFTImage();
-    }, 1000);
+      compressNFTImage()
+    }, 1000)
   }
 }
 
