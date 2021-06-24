@@ -18,10 +18,11 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
   let fileName = generateFileName()
   let key = `${fileName}.${extension}`
   try {
-    fs.writeFileSync(`thumb-image/${key}`, body)
+    await fs.writeFileSync(`thumb-image/${key}`, body)
     nftItem.thumbnailPath = key
     await nftItem.save()
   } catch (error) {
+    console.log(error)
     console.log('upload failed')
   }
 }
@@ -157,7 +158,7 @@ const compressNFTImage = async () => {
   if (nftItem) {
     let image = nftItem.imageURL
     console.log(image)
-    if (image) {
+    if (image && image.length > 0) {
       try {
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
