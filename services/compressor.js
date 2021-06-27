@@ -217,11 +217,11 @@ const compressNFTImage = async () => {
   }
 }
 
-// const compress = async () => {
-//   compressNFTImage()
-// }
-
 const compress = async () => {
-  await NFTITEM.update({}, { $set: { thumbnailPath: '-' } }, { multi: true })
+  compressNFTImage()
 }
+
+// const compress = async () => {
+//   await NFTITEM.update({}, { $set: { thumbnailPath: '-' } }, { multi: true })
+// }
 module.exports = compress
