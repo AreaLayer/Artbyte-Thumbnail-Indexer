@@ -156,10 +156,11 @@ const compressNFTImage = async () => {
     thumbnailPath: '-',
   })
   if (nftItem) {
-    let image = nftItem.imageURL
-    console.log(image)
-    if (image && image.length > 0) {
+    let tokenURI = nftItem.tokenURI
+    if (tokenURI && tokenURI.length > 0) {
       try {
+        let metadata = await axios.get(tokenURI, { timeout: 30000 })
+        let image = metadata.data.image
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
@@ -206,19 +207,21 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    compressNFTImage()
-  } else {
     setTimeout(() => {
       compressNFTImage()
     }, 1000)
+  } else {
+    setTimeout(() => {
+      compressNFTImage()
+    }, 2000)
   }
 }
 
-const compress = async () => {
-  compressNFTImage()
-}
-
 // const compress = async () => {
-//   await NFTITEM.update({}, { $set: { thumbnailPath: '-' } }, { multi: true })
+//   compressNFTImage()
 // }
+
+const compress = async () => {
+  await NFTITEM.update({}, { $set: { thumbnailPath: '-' } }, { multi: true })
+}
 module.exports = compress
