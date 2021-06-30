@@ -27,7 +27,7 @@ const uploadImageToInstance = async (body, extension, nftItem) => {
   }
 }
 
-const resizeBase64Image = async (source, limit = 120) => {
+const resizeBase64Image = async (source, limit = 200) => {
   try {
     if (source.startsWith('data:')) {
       source = source.split(',')[1]
