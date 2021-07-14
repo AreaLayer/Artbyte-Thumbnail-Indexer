@@ -41,7 +41,7 @@ const resizeBase64Image = async (source, limit = 200) => {
         Math.floor((width * limit) / size),
         Math.floor((height * limit) / size),
       )
-      const buffer = await image.toBuffer()
+      const buffer = await image.withMetadata().toBuffer()
       base64 = `data:image/${format};base64,` + buffer.toString('base64')
     } else {
       base64 = source
