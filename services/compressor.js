@@ -216,7 +216,7 @@ const compressNFTImage = async () => {
           //case gif
           case 1:
             {
-              request.get(imgURL, async function (err, res, body) {
+              request.get(image, async function (err, res, body) {
                 console.log('gif transforming')
                 console.log(err)
                 if (!body) reject('')
