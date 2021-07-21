@@ -153,10 +153,8 @@ const extractExtension = async (imgURL) => {
 
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
-    console.log(imgPath);
     let type = await extractExtension(imgPath)
     if (type == 'gif') {
-      console.log('gif image');
       return [1, null]
     }
     else if (type == 'non-image') return [2, null]
@@ -217,19 +215,14 @@ const compressNFTImage = async () => {
           case 1:
             {
               request.get(image, async function (err, res, body) {
-                console.log('gif transforming')
-                console.log(err)
                 if (!body) reject('')
                 if (body) {
-                  console.log('body\n', body)
                   let fileName = generateFileName()
                   let key = `thumb-image/${fileName}.gif`
                   try {
                     const gifRes = await gifResize({
                       width: 200
                     })(body);
-                    console.log('gifRes.length')
-                    console.log(gifRes.length)
                     fs.writeFileSync(key, gifRes);
                     nftItem.thumbnailPath = `${fileName}.gif`
                     nftItem.contentType = 'gif'
