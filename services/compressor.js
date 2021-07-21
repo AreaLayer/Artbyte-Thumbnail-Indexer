@@ -8,6 +8,7 @@ const sharp = require('sharp')
 const FileType = require('file-type')
 const gify = require('gify')
 const fs = require('fs')
+const gifResize = require('@gumlet/gif-resize')
 const mongoose = require('mongoose')
 const NFTITEM = mongoose.model('NFTITEM')
 
@@ -128,6 +129,8 @@ const extractExtension = async (imgURL) => {
                   FileType.fromBuffer(body).then(result => {
                     if ((result.mime || '').split('/')[0] === 'video') {
                       resolve('video')
+                    } else if ((result.mime || '').split('/')[0] === 'audio') {
+                      resolve('audio')
                     } else {
                       resolve('non-image')
                     }
@@ -152,18 +155,38 @@ const getThumbnailImageFromURL = async (imgPath) => {
   try {
     console.log(imgPath)
     let type = await extractExtension(imgPath)
-    if (type == 'gif') return [1, null]
+    if (type == 'gif') {
+      const buf = fs.readFileSync(imgPath);
+      let fileName = generateFileName()
+      let key = `thumb-image/${fileName}.gif`
+      try {
+        const res = await gifResize({
+          width: 200
+        })(buf);
+        await fs.writeFileSync(key, res);
+        return [1, `${fileName}.gif`]
+      } catch (error) {
+        //
+        return [1, null]
+      }
+    }
     else if (type == 'non-image') return [2, null]
+    else if (type == 'audio') return [6, null]
     else if (type == 'video') {
       var opts = {
         width: 200
       };
       let fileName = generateFileName()
       let key = `thumb-image/${fileName}.gif`
-      gify(imgPath, key, opts, function(err){
-        if (err) throw err;
-      });
-      return [5, `${fileName}.gif`];
+      try {
+        gify(imgPath, key, opts, function(err){
+          if (err) throw err;
+        });
+        return [5, `${fileName}.gif`];
+      } catch (error) {
+        //
+        return [5, 'non-image']
+      }
     } else {
       try {
         const buffer = await resizeImageFromURL(imgPath)
@@ -191,7 +214,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
 
 const compressNFTImage = async () => {
   let nftItem = await NFTITEM.findOne({
-    thumbnailPath: 'non-image',
+    thumbnailPath: '-',
   })
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
@@ -204,14 +227,19 @@ const compressNFTImage = async () => {
           //case gif
           case 1:
             {
-              nftItem.thumbnailPath = '.'
+              if (thumbnailInfo[1]) {
+                nftItem.thumbnailPath = 'thumbnailInfo[1]'
+              } else {
+                nftItem.thumbnailPath = '.'
+              }
+              nftItem.contentType = 'gif'
               await nftItem.save()
             }
             break
           // non-image case
           case 2:
             {
-              nftItem.thumbnailPath = 'non-image-audio'
+              nftItem.thumbnailPath = 'non-image'
               await nftItem.save()
             }
             break
@@ -222,9 +250,18 @@ const compressNFTImage = async () => {
               await nftItem.save()
             }
             break
+          case 6:
+            {
+              nftItem.thumbnailPath = 'non-image'
+              nftItem.contentType = 'audio'
+              await nftItem.save()
+            }
+            break
           // case image
           case 3:
             {
+              nftItem.contentType = 'image'
+              await nftItem.save()
               await uploadImageToInstance(
                 thumbnailInfo[1],
                 thumbnailInfo[2],
