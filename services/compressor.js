@@ -1,10 +1,12 @@
 require('dotenv').config()
 const axios = require('axios')
 const https = require('https')
+const readChunk = require('read-chunk')
 const imageType = require('image-type')
 const request = require('request').defaults({ encoding: null })
 const sharp = require('sharp')
 const FileType = require('file-type')
+const gify = require('gify')
 const fs = require('fs')
 const mongoose = require('mongoose')
 const NFTITEM = mongoose.model('NFTITEM')
@@ -103,13 +105,38 @@ const extractExtension = async (imgURL) => {
           response.destroy()
           if (chunk) {
             if (imageType(chunk)) resolve(imageType(chunk).ext)
-            else resolve('non-image')
+            else {
+              FileType.fromBuffer(chunk)
+              .then(result => {
+                if ((result.mime || '').split('/')[0] === 'video') {
+                  resolve('video')
+                } else {
+                  resolve('non-image')
+                }
+              })
+              .catch(() => {
+                resolve('non-image')
+              })
+            }
           } else {
             request.get(imgURL, function (err, res, body) {
               if (!body) reject('')
-              if (body && imageType(body)) {
-                resolve(imageType(body).ext)
-              } else resolve('non-image')
+              if (body) {
+                if (imageType(body)) {
+                  resolve(imageType(body).ext)
+                } else {
+                  FileType.fromBuffer(body).then(result => {
+                    if ((result.mime || '').split('/')[0] === 'video') {
+                      resolve('video')
+                    } else {
+                      resolve('non-image')
+                    }
+                  })
+                  .catch((err) => {
+                    resolve('non-image')
+                  })
+                }
+              }
             })
           }
         })
@@ -126,7 +153,17 @@ const getThumbnailImageFromURL = async (imgPath) => {
     let type = await extractExtension(imgPath)
     if (type == 'gif') return [1, null]
     else if (type == 'non-image') return [2, null]
-    else {
+    else if (type == 'video') {
+      var opts = {
+        width: 200
+      };
+      let fileName = generateFileName()
+      let key = `thumb-image/${fileName}.gif`
+      gify(imgPath, key, opts, function(err){
+        if (err) throw err;
+      });
+      return [5, key];
+    } else {
       try {
         const buffer = await resizeImageFromURL(imgPath)
         return [3, buffer, type]
@@ -153,14 +190,14 @@ const getThumbnailImageFromURL = async (imgPath) => {
 
 const compressNFTImage = async () => {
   let nftItem = await NFTITEM.findOne({
-    thumbnailPath: '-',
+    thumbnailPath: 'non-image',
   })
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
     if (tokenURI && tokenURI.length > 0) {
       try {
         let metadata = await axios.get(tokenURI, { timeout: 30000 })
-        let image = metadata.data.image
+        let image = metadata.data.image || metadata.data.imageurl
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
@@ -174,6 +211,13 @@ const compressNFTImage = async () => {
           case 2:
             {
               nftItem.thumbnailPath = 'non-image'
+              await nftItem.save()
+            }
+            break
+          case 5:
+            {
+              nftItem.thumbnailPath = thumbnailInfo[1]
+              nftItem.contentType = 'video'
               await nftItem.save()
             }
             break
@@ -199,7 +243,6 @@ const compressNFTImage = async () => {
           }
         }
       } catch (error) {
-        console.log(error)
         nftItem.thumbnailPath = '.'
         await nftItem.save()
       }
@@ -209,11 +252,11 @@ const compressNFTImage = async () => {
     }
     setTimeout(() => {
       compressNFTImage()
-    }, 1000)
+    }, 2000)
   } else {
     setTimeout(() => {
       compressNFTImage()
-    }, 2000)
+    }, 500)
   }
 }
 
