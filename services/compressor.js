@@ -162,7 +162,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
       gify(imgPath, key, opts, function(err){
         if (err) throw err;
       });
-      return [5, key];
+      return [5, `${fileName}.gif`];
     } else {
       try {
         const buffer = await resizeImageFromURL(imgPath)
