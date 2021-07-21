@@ -150,6 +150,7 @@ const extractExtension = async (imgURL) => {
 
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
+    console.log(imgPath)
     let type = await extractExtension(imgPath)
     if (type == 'gif') return [1, null]
     else if (type == 'non-image') return [2, null]
@@ -210,7 +211,7 @@ const compressNFTImage = async () => {
           // non-image case
           case 2:
             {
-              nftItem.thumbnailPath = 'non-image'
+              nftItem.thumbnailPath = 'non-image-audio'
               await nftItem.save()
             }
             break
