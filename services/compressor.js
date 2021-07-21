@@ -228,7 +228,7 @@ const compressNFTImage = async () => {
           case 1:
             {
               if (thumbnailInfo[1]) {
-                nftItem.thumbnailPath = 'thumbnailInfo[1]'
+                nftItem.thumbnailPath = thumbnailInfo[1]
               } else {
                 nftItem.thumbnailPath = '.'
               }
@@ -303,6 +303,6 @@ const compress = async () => {
 }
 
 // const compress = async () => {
-//   await NFTITEM.update({}, { $set: { thumbnailPath: '-' } }, { multi: true })
+//   await NFTITEM.update({thumbnailPath: '.'}, { $set: { thumbnailPath: '-' } }, { multi: true })
 // }
 module.exports = compress
