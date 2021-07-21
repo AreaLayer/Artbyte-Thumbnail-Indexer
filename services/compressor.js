@@ -205,7 +205,6 @@ const compressNFTImage = async () => {
   let nftItem = await NFTITEM.findOne({
     thumbnailPath: '-',
   })
-  console.log(nftItem)
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
     if (tokenURI && tokenURI.length > 0) {
@@ -308,11 +307,11 @@ const compressNFTImage = async () => {
   }
 }
 
-// const compress = async () => {
-//   compressNFTImage()
-// }
-
 const compress = async () => {
-  await NFTITEM.update({thumbnailPath: '.'}, { $set: { thumbnailPath: '-' } }, { multi: true })
+  compressNFTImage()
 }
+
+// const compress = async () => {
+//   await NFTITEM.update({thumbnailPath: '.'}, { $set: { thumbnailPath: '-' } }, { multi: true })
+// }
 module.exports = compress
