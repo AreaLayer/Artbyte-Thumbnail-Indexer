@@ -153,22 +153,9 @@ const extractExtension = async (imgURL) => {
 
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
-    console.log(imgPath)
     let type = await extractExtension(imgPath)
     if (type == 'gif') {
-      const buf = fs.readFileSync(imgPath);
-      let fileName = generateFileName()
-      let key = `thumb-image/${fileName}.gif`
-      try {
-        const res = await gifResize({
-          width: 200
-        })(buf);
-        await fs.writeFileSync(key, res);
-        return [1, `${fileName}.gif`]
-      } catch (error) {
-        //
-        return [1, null]
-      }
+      return [1, null]
     }
     else if (type == 'non-image') return [2, null]
     else if (type == 'audio') return [6, null]
@@ -227,13 +214,29 @@ const compressNFTImage = async () => {
           //case gif
           case 1:
             {
-              if (thumbnailInfo[1]) {
-                nftItem.thumbnailPath = thumbnailInfo[1]
-              } else {
-                nftItem.thumbnailPath = '.'
-              }
-              nftItem.contentType = 'gif'
-              await nftItem.save()
+              request.get(imgURL, async function (err, res, body) {
+                if (!body) reject('')
+                if (body) {
+
+                  let fileName = generateFileName()
+                  let key = `thumb-image/${fileName}.gif`
+                  try {
+                    const gifRes = await gifResize({
+                      width: 200
+                    })(body);
+                    fs.writeFileSync(key, gifRes);
+                    nftItem.thumbnailPath = `${fileName}.gif`
+                    nftItem.contentType = 'gif'
+                    await nftItem.save()
+                  } catch (error) {
+                    console.log('-----------------------');
+                    console.log(error);
+                    nftItem.thumbnailPath = '.'
+                    nftItem.contentType = 'gif'
+                    await nftItem.save()
+                  }
+                }
+              });
             }
             break
           // non-image case
