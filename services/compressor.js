@@ -205,6 +205,7 @@ const compressNFTImage = async () => {
   let nftItem = await NFTITEM.findOne({
     thumbnailPath: '-',
   })
+  console.log(nftItem)
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
     if (tokenURI && tokenURI.length > 0) {
