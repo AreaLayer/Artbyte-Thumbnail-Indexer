@@ -205,6 +205,7 @@ const compressNFTImage = async () => {
   })
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
+    let timeoutInterval = 2000;
     if (tokenURI && tokenURI.length > 0) {
       try {
         let metadata = await axios.get(tokenURI, { timeout: 30000 })
@@ -249,6 +250,7 @@ const compressNFTImage = async () => {
             {
               nftItem.thumbnailPath = thumbnailInfo[1]
               nftItem.contentType = 'video'
+              timeoutInterval = 10000
               await nftItem.save()
             }
             break
@@ -292,7 +294,7 @@ const compressNFTImage = async () => {
     }
     setTimeout(() => {
       compressNFTImage()
-    }, 2000)
+    }, timeoutInterval)
   } else {
     setTimeout(() => {
       compressNFTImage()
