@@ -100,7 +100,7 @@ const extractExtension = async (imgURL) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      https.get(imgURL, { timeout: 5000 }, (response) => {
+      https.get(imgURL, { timeout: 10000 }, (response) => {
         response.on('readable', () => {
           const chunk = response.read(imageType.minimumBytes)
           response.destroy()
@@ -148,6 +148,14 @@ const extractExtension = async (imgURL) => {
           console.log('promise error', err);
           resolve('non-image');
         });
+      })
+      .on("timeout", () => {
+        console.log('promise timeout');
+        resolve('non-image');
+      })
+      .on("abort", () => {
+        console.log('promise aborted');
+        resolve('non-image');
       })
     } catch (error) {
       console.log('promise error')
