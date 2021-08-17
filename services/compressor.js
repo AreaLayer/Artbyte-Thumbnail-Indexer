@@ -253,8 +253,9 @@ const compressNFTImage = async () => {
                   } catch (error) {
                     console.log('-----------------------');
                     console.log(error);
-                    nftItem.thumbnailPath = 'embed'
-                    nftItem.contentType = 'embed'
+                    fs.writeFileSync(key, body);
+                    nftItem.thumbnailPath = `${fileName}.gif`
+                    nftItem.contentType = 'gif'
                     await nftItem.save()
                   }
                   setTimeout(() => {
