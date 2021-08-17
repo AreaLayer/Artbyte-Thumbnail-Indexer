@@ -167,7 +167,6 @@ const extractExtension = async (imgURL) => {
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
     let type = await extractExtension(imgPath)
-    console.log(type);
     if (type == 'gif') {
       return [1, null]
     }
@@ -219,14 +218,11 @@ const compressNFTImage = async () => {
   })
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
-    console.log('-------------------------------');
-    console.log(tokenURI);
     let timeoutInterval = 2000;
     if (tokenURI && tokenURI.length > 0) {
       try {
         let metadata = await axios.get(tokenURI, { timeout: 30000 })
         let image = metadata.data.image || metadata.data.imageurl
-        console.log(image);
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
@@ -246,7 +242,6 @@ const compressNFTImage = async () => {
                 if (body) {
                   let fileName = generateFileName()
                   let key = `thumb-image/${fileName}.gif`
-                  console.log(key);
                   try {
                     const gifRes = await gifResize({
                       width: 200
@@ -255,13 +250,11 @@ const compressNFTImage = async () => {
                     nftItem.thumbnailPath = `${fileName}.gif`
                     nftItem.contentType = 'gif'
                     await nftItem.save()
-                    console.log('-----------------------');
-                    console.log('gif succeed');
                   } catch (error) {
                     console.log('-----------------------');
                     console.log(error);
-                    nftItem.thumbnailPath = '.'
-                    nftItem.contentType = 'gif'
+                    nftItem.thumbnailPath = 'embed'
+                    nftItem.contentType = 'embed'
                     await nftItem.save()
                   }
                   setTimeout(() => {
