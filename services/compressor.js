@@ -167,6 +167,7 @@ const extractExtension = async (imgURL) => {
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
     let type = await extractExtension(imgPath)
+    console.log(type);
     if (type == 'gif') {
       return [1, null]
     }
@@ -218,11 +219,14 @@ const compressNFTImage = async () => {
   })
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
+    console.log('-------------------------------');
+    console.log(tokenURI);
     let timeoutInterval = 2000;
     if (tokenURI && tokenURI.length > 0) {
       try {
         let metadata = await axios.get(tokenURI, { timeout: 30000 })
         let image = metadata.data.image || metadata.data.imageurl
+        console.log(image);
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
           //case gif
@@ -320,6 +324,6 @@ const compress = async () => {
 }
 
 // const compress = async () => {
-//   await NFTITEM.update({thumbnailPath: '.'}, { $set: { thumbnailPath: '-' } }, { multi: true })
+//   await NFTITEM.update({thumbnailPath: 'embed'}, { $set: { thumbnailPath: '-', contentType: 'image', isFiltered: false } }, { multi: true })
 // }
 module.exports = compress
