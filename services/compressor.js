@@ -232,11 +232,21 @@ const compressNFTImage = async () => {
           //case gif
           case 1:
             {
+              timeoutInterval = 0;
               request.get(image, async function (err, res, body) {
-                if (!body) reject('')
+                if (!body) {
+                  console.log('gif image load failed');
+                  nftItem.thumbnailPath = '.'
+                  nftItem.contentType = 'gif'
+                  await nftItem.save()
+                  setTimeout(() => {
+                    compressNFTImage()
+                  }, 500)
+                } 
                 if (body) {
                   let fileName = generateFileName()
                   let key = `thumb-image/${fileName}.gif`
+                  console.log(key);
                   try {
                     const gifRes = await gifResize({
                       width: 200
@@ -245,6 +255,8 @@ const compressNFTImage = async () => {
                     nftItem.thumbnailPath = `${fileName}.gif`
                     nftItem.contentType = 'gif'
                     await nftItem.save()
+                    console.log('-----------------------');
+                    console.log('gif succeed');
                   } catch (error) {
                     console.log('-----------------------');
                     console.log(error);
@@ -252,6 +264,9 @@ const compressNFTImage = async () => {
                     nftItem.contentType = 'gif'
                     await nftItem.save()
                   }
+                  setTimeout(() => {
+                    compressNFTImage()
+                  }, 500)
                 }
               });
             }
@@ -309,9 +324,11 @@ const compressNFTImage = async () => {
       nftItem.thumbnailPath = '.'
       await nftItem.save()
     }
-    setTimeout(() => {
-      compressNFTImage()
-    }, timeoutInterval)
+    if (timeoutInterval > 0) {
+      setTimeout(() => {
+        compressNFTImage()
+      }, timeoutInterval)
+    }
   } else {
     setTimeout(() => {
       compressNFTImage()
