@@ -215,7 +215,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
 const compressNFTImage = async () => {
   let nftItem = await NFTITEM.findOne({
     thumbnailPath: '-',
-  })
+  }, {sort:{$natural:-1}})
   if (nftItem) {
     let tokenURI = nftItem.tokenURI
     let timeoutInterval = 1000;
@@ -238,7 +238,7 @@ const compressNFTImage = async () => {
                   setTimeout(() => {
                     compressNFTImage()
                   }, 500)
-                } 
+                }
                 if (body) {
                   let fileName = generateFileName()
                   let key = `thumb-image/${fileName}.gif`
