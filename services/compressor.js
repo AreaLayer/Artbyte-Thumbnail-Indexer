@@ -166,6 +166,14 @@ const extractExtension = async (imgURL) => {
 
 const getThumbnailImageFromURL = async (imgPath) => {
   try {
+    if (imgPath.startsWith('data:image/')) {
+      const imageRes = await resizeBase64Image(imgPath)
+      let imageTypeT = 'jpg'
+      if (imageType(imageRes)) {
+        imageTypeT = imageType(imageRes).ext
+      }
+      return [3, imageRes, imageTypeT]
+    }
     let type = await extractExtension(imgPath)
     if (type == 'gif') {
       return [1, null]
@@ -196,7 +204,7 @@ const getThumbnailImageFromURL = async (imgPath) => {
       }
     }
   } catch (error) {
-    console.log('cannot get thumbnail from url')
+    console.log('cannot get thumbnail from url\n', error)
     try {
       const buffer = await resizeImageFromURL(imgPath)
       let fileType = await FileType.fromBuffer(buffer)
@@ -219,10 +227,18 @@ const compressNFTImage = async () => {
   if (nftArr && nftArr.length > 0) {
     let nftItem = nftArr[0];
     let tokenURI = nftItem.tokenURI
+  
     let timeoutInterval = 1000;
     if (tokenURI && tokenURI.length > 0) {
       try {
-        let metadata = await axios.get(tokenURI, { timeout: 10000 })
+        let metadata = {};
+        if (tokenURI.startsWith('data:application/json;base64,')) {
+          metadata = {
+            data: JSON.parse(Buffer.from(tokenURI.substr(29), 'base64').toString())
+          }
+        } else {
+          metadata = await axios.get(tokenURI, { timeout: 10000 })
+        }
         let image = metadata.data.image || metadata.data.imageurl
         let thumbnailInfo = await getThumbnailImageFromURL(image)
         switch (thumbnailInfo[0]) {
